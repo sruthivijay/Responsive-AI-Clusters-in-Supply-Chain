@@ -1,0 +1,56 @@
+{"outlet": {
+            "outlet_id": "1",
+            "outlet_location": "Chennai",
+            "central_hub_location": "Bangalore",
+            "date": "2023-12-07T15:04:05Z",
+            "event": "Summer Fashion Festival",
+            "event_description": "The upcoming Summer Fashion Festival is expected to significantly increase the demand for fashion retail. We anticipate higher footfall in our Chennai store due to the festival season. T-shirts and dresses are particularly in demand during summer festivals in South India.",
+            "client_preferences": "Chennai customers prefer comfortable cotton clothing due to the warm climate. T-shirts and traditional formal wear are popular among the working professionals. Current fashion trends show increased demand for casual tops and western wear.",
+            "weather": "warm and humid",
+            "outlet_inventory": {
+                "t_shirt": {
+                    "current_storage_amount": 100,
+                    "daily_replenishment_without_envent_from_central_hub": 30,
+                    "max_warehouse_capacity": 500
+                },
+                "dress": {
+                    "current_storage_amount": 200,
+                    "daily_replenishment_without_envent_from_central_hub": 50,
+                    "max_warehouse_capacity": 300
+                },
+                "pants": {
+                    "current_storage_amount": 150,
+                    "daily_replenishment_without_envent_from_central_hub": 40,
+                    "max_warehouse_capacity": 400
+                },
+                "tops": {
+                    "current_storage_amount": 150,
+                    "daily_replenishment_without_envent_from_central_hub": 40,
+                    "max_warehouse_capacity": 500
+                }
+            }
+        }
+    ,
+        "output_format": 
+        {
+        "outlet_inventory": {
+            "t_shirt": {
+                "future_storage_amount": "<NUM>",
+                "specific_reason_of_replenishment": "<STRING>"
+            },
+            "dress": {
+                "future_storage_amount": "<NUM>",
+                "specific_reason_of_replenishment": "<STRING>"
+            },
+            "pants": {
+                "future_storage_amount": "<NUM>",
+                "specific_reason_of_replenishment": "<STRING>"
+            },
+            "tops": {
+                "future_storage_amount": "<NUM>",
+                "specific_reason_of_replenishment": "<STRING>"
+            }
+        },
+        "transportation_duration": "<NUM> day"
+    }
+}

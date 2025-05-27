@@ -1,0 +1,16 @@
+{
+    "central_hub_inventory": {
+        "t_shirt": {
+            "current_storage_amount": 1000
+        },
+        "dress": {
+            "current_storage_amount": 500
+        },
+        "pants": {
+            "current_storage_amount": 800
+        },
+        "tops": {
+            "current_storage_amount": 700
+        }
+    }
+}

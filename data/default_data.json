@@ -1,0 +1,35 @@
+{
+            "outlet_inventory": {
+                "t_shirt": {
+                    "future_storage_amount": 50,
+                    "specific_reason_of_replenishment": "to meet the moderate demand as per the client's preferences"
+                },
+                "dress": {
+                    "future_storage_amount": 30,
+                    "specific_reason_of_replenishment": "to maintain a minimal stock level due to the client's minimal interest"
+                },
+                "pants": {
+                    "future_storage_amount": 40,
+                    "specific_reason_of_replenishment": "to meet the strong demand as per the client's preferences"
+                },
+                "tops": {
+                    "future_storage_amount": 35,
+                    "specific_reason_of_replenishment": "to meet the strong demand as per the client's preferences"
+                }
+            },
+            "central_hub_inventory": {
+                "t_shirt": {
+                    "current_storage_amount": 1000
+                },
+                "dress": {
+                    "current_storage_amount": 500
+                },
+                "pants": {
+                    "current_storage_amount": 800
+                },
+                "tops": {
+                    "current_storage_amount": 700
+                }
+            },
+            "transportation_duration": 1
+        }

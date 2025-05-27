@@ -12,51 +12,55 @@ from multi_agent_communication_supply_chain import role_playing, messages_queue
 
 global central_hub_json
 
-central_hub_json = {
-    "central_hub_inventory": {
-        "baguette": {
-            "current_storage_amount": 1000,
-        },
-        "black_tea": {
-            "current_storage_amount": 1000,
-        },
-        "manchego_cheese": {
-            "current_storage_amount": 1000,
-        },
-        "olive_oil": {
-            "current_storage_amount": 1000,
-        },
-    }
-}
+# Importing central hub json
+with open('../../data/central_hub.json', 'r') as f:
+    central_hub_json = json.load(f)
+
+# central_hub_json = {
+#     "central_hub_inventory": {
+#         "t_shirt": {
+#             "current_storage_amount": 1000,
+#         },
+#         "dress": {
+#             "current_storage_amount": 500,
+#         },
+#         "pants": {
+#             "current_storage_amount": 800,
+#         },
+#         "tops": {
+#             "current_storage_amount": 700,
+#         },
+#     }
+# }
 
 # Example of request JSON
 # response_json = {
 #     "outlet_inventory": {
-#         "olive_oil": {
+#         "t_shirt": {
 #             "changed_replenishment_amount_from_central_hub": 1000,
 #         },
-#         "baguette": {
-#             "changed_replenishment_amount_from_central_hub": 1000,
+#         "dress": {
+#             "changed_replenishment_amount_from_central_hub": 500,
 #         },
-#         "manchego_cheese": {
-#             "changed_replenishment_amount_from_central_hub": 1000,
+#         "pants": {
+#             "changed_replenishment_amount_from_central_hub": 800,
 #         },
-#         "black_tea": {
-#             "changed_replenishment_amount_from_central_hub": 1000,
+#         "tops": {
+#             "changed_replenishment_amount_from_central_hub": 700,
 #         }
 #     },
 #     "central_hub_inventory": {
-#         "olive_oil": {
+#         "t_shirt": {
 #             "current_storage_amount": 1000,
 #         },
-#         "baguette": {
-#             "current_storage_amount": 1000,
+#         "dress": {
+#             "current_storage_amount": 500,
 #         },
-#         "manchego_cheese": {
-#             "current_storage_amount": 1000,
+#         "pants": {
+#             "current_storage_amount": 800,
 #         },
-#         "black_tea": {
-#             "current_storage_amount": 1000,
+#         "tops": {
+#             "current_storage_amount": 700,
 #         },
 #     },
 #     "transportation_duration": 1
@@ -134,68 +138,80 @@ def handle_ai_request():
         return json_data
 
     request_data = format_product_names(request_data)
+    print('request data: ', request_data)
 
     # Perform some AI-related processing with role_playing
     global central_hub_json
     try:
         cleanup_chat_record()  # Cleanup the chat record
         response_json, updated_central_hub_json = role_playing(request_json=request_data, central_hub_json=central_hub_json)
+        print('response_json1: ', response_json)
+        print('updated_central_hub_json1: ', updated_central_hub_json)
     except:
         # If the role_playing function fails, return a default response
-        response_json = {
-            "outlet_inventory": {
-                "baguette": {
-                    "future_storage_amount": 50,
-                    "specific_reason_of_replenishment": "to meet the moderate demand as per the client\"s preferences"
-                },
-                "black_tea": {
-                    "future_storage_amount": 20,
-                    "specific_reason_of_replenishment": "to maintain a minimal stock level due to the client\"s minimal interest"
-                },
-                "manchego_cheese": {
-                    "future_storage_amount": 40,
-                    "specific_reason_of_replenishment": "to meet the strong demand as per the client\"s preferences"
-                },
-                "olive_oil": {
-                    "future_storage_amount": 30,
-                    "specific_reason_of_replenishment": "to meet the strong demand as per the client\"s preferences"
-                }
-            },
-            "central_hub_inventory": {
-                "baguette": {
-                    "current_storage_amount": 530
-                },
-                "black_tea": {
-                    "current_storage_amount": 364
-                },
-                "manchego_cheese": {
-                    "current_storage_amount": 530
-                },
-                "olive_oil": {
-                    "current_storage_amount": 180
-                }
-            },
-            "transportation_duration": 1
-        }
-        updated_central_hub_json = {
-            "central_hub_inventory": {
-                "baguette": {
-                    "current_storage_amount": 530
-                },
-                "black_tea": {
-                    "current_storage_amount": 364
-                },
-                "manchego_cheese": {
-                    "current_storage_amount": 530
-                },
-                "olive_oil": {
-                    "current_storage_amount": 180
-                }
-            }
-        }
+        with open('../../data/default_data.json', 'r') as f:
+            response_json = json.load(f)
+        print('response_json2: ', response_json)
+        
+        # response_json = {
+        #     "outlet_inventory": {
+        #         "t_shirt": {
+        #             "future_storage_amount": 50,
+        #             "specific_reason_of_replenishment": "to meet the moderate demand as per the client's preferences"
+        #         },
+        #         "dress": {
+        #             "future_storage_amount": 30,
+        #             "specific_reason_of_replenishment": "to maintain a minimal stock level due to the client's minimal interest"
+        #         },
+        #         "pants": {
+        #             "future_storage_amount": 40,
+        #             "specific_reason_of_replenishment": "to meet the strong demand as per the client's preferences"
+        #         },
+        #         "tops": {
+        #             "future_storage_amount": 35,
+        #             "specific_reason_of_replenishment": "to meet the strong demand as per the client's preferences"
+        #         }
+        #     },
+        #     "central_hub_inventory": {
+        #         "t_shirt": {
+        #             "current_storage_amount": 1000
+        #         },
+        #         "dress": {
+        #             "current_storage_amount": 500
+        #         },
+        #         "pants": {
+        #             "current_storage_amount": 800
+        #         },
+        #         "tops": {
+        #             "current_storage_amount": 700
+        #         }
+        #     },
+        #     "transportation_duration": 1
+        # }
+
+        # updated_central_hub_json = {
+        #     "central_hub_inventory": {
+        #         "t_shirt": {
+        #             "current_storage_amount": 1000
+        #         },
+        #         "dress": {
+        #             "current_storage_amount": 500
+        #         },
+        #         "pants": {
+        #             "current_storage_amount": 800
+        #         },
+        #         "tops": {
+        #             "current_storage_amount": 700
+        #         }
+        #     }
+        # }
+
+        updated_central_hub_json = {'central_hub_inventory': response_json['central_hub_inventory']}
+        print('updated_central_hub_json2 :', updated_central_hub_json)
 
     for product in updated_central_hub_json["central_hub_inventory"]:
         product_account = int(updated_central_hub_json["central_hub_inventory"][product]["current_storage_amount"])
+        print('product_account: ', product_account)
         if product_account <= 0:
             updated_central_hub_json["central_hub_inventory"][product]["current_storage_amount"] = 1000
             print(f"Product {product} is out of stock, replenished to 1000.")

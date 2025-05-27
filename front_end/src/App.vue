@@ -28,7 +28,7 @@
         <table>
           <thead>
             <tr>
-              <th colspan="2">Auchan</th>
+              <th colspan="2">Chennai</th>
             </tr>
           </thead>
           <tbody>
@@ -43,7 +43,7 @@
         <table>
           <thead>
             <tr>
-              <th colspan="2">Carrefour</th>
+              <th colspan="2">Bangalore</th>
             </tr>
           </thead>
           <tbody>
@@ -58,7 +58,7 @@
         <table>
           <thead>
             <tr>
-              <th colspan="2">Monoprix</th>
+              <th colspan="2">Mumbai</th>
             </tr>
           </thead>
           <tbody>
@@ -73,7 +73,7 @@
         <table>
           <thead>
             <tr>
-              <th colspan="2">Normal</th>
+              <th colspan="2">Pune</th>
             </tr>
           </thead>
           <tbody>
@@ -87,16 +87,16 @@
     </div>
     <div class="communication">
       <button @click="toggleMessages1(1)" class="toggle-button show1">
-        Auchan Messages
+        Chennai Messages
       </button>
       <button @click="toggleMessages2(1)" class="toggle-button show2">
-        Carrefour Messages
+        Bangalore Messages  
       </button>
       <button @click="toggleMessages3(1)" class="toggle-button show3">
-        Monoprix Messages
+        Mumbai Messages
       </button>
       <button @click="toggleMessages4(1)" class="toggle-button show4">
-        Normal Messages
+        Pune Messages
       </button>
       <div class="event">
         <p class="event1">{{ event1 }}</p>
@@ -141,34 +141,34 @@ export default {
   data() {
     return {
       stock0: new Map([
-        ["Baguette", 0],
-        ["Black Tea", 0],
-        ["Manchego Cheese", 0],
-        ["Olive Oil", 0],
+        ["T-Shirts", 0],
+        ["Dress", 0], 
+        ["Pants", 0],
+        ["Tops", 0],
       ]),
       stock1: new Map([
-        ["Baguette", 0],
-        ["Black Tea", 0],
-        ["Manchego Cheese", 0],
-        ["Olive Oil", 0],
+        ["T-Shirts", 0],
+        ["Dress", 0],
+        ["Pants", 0], 
+        ["Tops", 0],
       ]),
       stock2: new Map([
-        ["Baguette", 0],
-        ["Black Tea", 0],
-        ["Manchego Cheese", 0],
-        ["Olive Oil", 0],
+        ["T-Shirts", 0],
+        ["Dress", 0],
+        ["Pants", 0],
+        ["Tops", 0],
       ]),
       stock3: new Map([
-        ["Baguette", 0],
-        ["Black Tea", 0],
-        ["Manchego Cheese", 0],
-        ["Olive Oil", 0],
+        ["T-Shirts", 0],
+        ["Dress", 0],
+        ["Pants", 0],
+        ["Tops", 0],
       ]),
       stock4: new Map([
-        ["Baguette", 0],
-        ["Black Tea", 0],
-        ["Manchego Cheese", 0],
-        ["Olive Oil", 0],
+        ["T-Shirts", 0],
+        ["Dress", 0],
+        ["Pants", 0],
+        ["Tops", 0],
       ]),
       onedaytime: 60000, // 60s/day
       date: null,
@@ -458,11 +458,11 @@ export default {
           break;
       }
       /*
-      Product name        Color
-      "Olive Oil"       : red
-      "Baguette"        : blue
-      "Manchego Cheese" : green
-      "Black Tea"       : orange
+      Product name    Color
+      "T-Shirts"    : red
+      "Dress"       : blue  
+      "Pants"       : green
+      "Tops"        : orange
       */
       Object.entries(supermarketInfo.productAdd).forEach((table) => {
         let key = table[0];
@@ -503,7 +503,7 @@ export default {
             }
           }, this.onedaytime);
 
-          if (key == "Olive Oil") {
+          if (key == "T-Shirts") {
             const boxa = this.svg
               .append("image")
               .attr("x", this.warehouse.x + size)
@@ -536,7 +536,7 @@ export default {
               .attr("y", target.y + 2.3 * size)
               .on("end", () => boxat.remove());
           }
-          if (key == "Baguette") {
+          if (key == "Dress") {
             const boxb = this.svg
               .append("image")
               .attr("x", this.warehouse.x + size)
@@ -569,7 +569,7 @@ export default {
               .attr("y", target.y + 0.3 * size)
               .on("end", () => boxbt.remove());
           }
-          if (key == "Manchego Cheese") {
+          if (key == "Pants") {
             const boxc = this.svg
               .append("image")
               .attr("x", this.warehouse.x - size)
@@ -602,7 +602,7 @@ export default {
               .attr("y", target.y + 0.3 * size)
               .on("end", () => boxct.remove());
           }
-          if (key == "Black Tea") {
+          if (key == "Tops") {
             const boxd = this.svg
               .append("image")
               .attr("x", this.warehouse.x - size)

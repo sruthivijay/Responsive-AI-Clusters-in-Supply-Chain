@@ -27,16 +27,16 @@ type Outlet struct {
 }
 
 func InstanceOutlets() {
-	// Define the unique combination of product indices for each outlet.
+	// Define the unique combination of product indices for each outlet
 	outletProductIndices := [][]int{
-		{0, 1, 2},
-		{0, 1, 3},
-		{0, 2, 3},
-		{1, 2, 3},
+		{0, 1, 2}, // Chennai: T-shirt, Dress, Pants
+		{0, 1, 3}, // Mumbai: T-shirt, Dress, Tops
+		{0, 2, 3}, // Bangalore: T-shirt, Pants, Tops
+		{1, 2, 3}, // Pune: Dress, Pants, Tops
 	}
 
-	// Define 4 locations for each outlet.
-	outletLocations := []string{"Paris", "Lyon", "Marseille", "Nice"}
+	// Define 4 locations for each outlet
+	outletLocations := []string{"Chennai", "Mumbai", "Bangalore", "Pune"}
 
 	// Clear the allOutlets
 	allOutlets = []*Outlet{}
@@ -197,14 +197,14 @@ func NewOutlet(outletID string, location string, numberOfEvents int, holidayEven
 	}
 	// Set the client preferences
 	switch location {
-	case "Paris":
-		o.clientPreferences = "Strong preference for Manchego Cheese and Olive Oil, moderate demand for Baguette, minimal interest in Black Tea."
-	case "Lyon":
-		o.clientPreferences = "Strong preference for Manchego Cheese and Olive Oil, moderate demand for Baguette, minimal interest in Black Tea."
-	case "Marseille":
-		o.clientPreferences = "High interest in Olive Oil and Black Tea, moderate preference for Baguette, low demand for Manchego Cheese."
-	case "Nice":
-		o.clientPreferences = "Strong demand for Olive Oil and Baguette, moderate interest in Black Tea, minimal preference for Manchego Cheese."
+	case "Chennai":
+		o.clientPreferences = "Strong preference for cotton T-shirts and traditional Dresses, moderate demand for Pants, high interest in casual Tops due to warm climate."
+	case "Bangalore":
+		o.clientPreferences = "High demand for formal wear including Pants and Tops, moderate interest in T-shirts, steady demand for corporate Dresses."
+	case "Mumbai":
+		o.clientPreferences = "Fashion-forward preferences with high demand for trendy Tops and Dresses, strong interest in designer T-shirts and stylish Pants."
+	case "Pune":
+		o.clientPreferences = "Balance of traditional and modern wear, steady demand for casual T-shirts and Tops, moderate interest in Dresses and Pants."
 	}
 	// Copy the inventory
 	for name, prod := range *inventory {

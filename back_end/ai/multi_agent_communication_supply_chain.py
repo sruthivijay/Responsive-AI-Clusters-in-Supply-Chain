@@ -17,65 +17,74 @@ messages_queue = queue.Queue()
 
 def role_playing(model_type=ModelType.GPT_3_5_TURBO, chat_turn_limit=30, request_json=None, central_hub_json=None) -> None:
     if request_json is None:
-        # Default request json
-        request_json = {
-            "outlet_id": "1",
-            "outlet_location": "Lyon",
-            "central_hub_location": "Paris",
-            "date": "2023-12-07T15:04:05Z",
-            "event": "Lavender Festival",
-            "event_description": "The upcoming Lavender Festival in the region is expected to significantly increase the demand for local specialties. We anticipate a higher demand for Olive Oil and Baguette as tourists prefer local culinary experiences. Preparing additional stock of these items is advised to meet the increased customer flow.",
-            "client_preferences": "Customers in Marseille show a strong preference for locally sourced products, with an emphasis on organic and artisanal options. Olive Oil and Baguettes are particularly popular, aligning with regional culinary traditions.",
-            "weather": "rainy",
-            "outlet_inventory": {
-                "olive_oil": {
-                    "current_storage_amount": 100,
-                    "daily_replenishment_without_envent_from_central_hub": 30,
-                    "max_warehouse_capacity": 500
-                },
-                "baguette": {
-                    "current_storage_amount": 200,
-                    "daily_replenishment_without_envent_from_central_hub": 50,
-                    "max_warehouse_capacity": 300
-                },
-                "manchego_cheese": {
-                    "current_storage_amount": 150,
-                    "daily_replenishment_without_envent_from_central_hub": 40,
-                    "max_warehouse_capacity": 400
-                },
-                "black_tea": {
-                    "current_storage_amount": 150,
-                    "daily_replenishment_without_envent_from_central_hub": 40,
-                    "max_warehouse_capacity": 500
-                }
-            }
-        }
+        # Update the default request json
+        # request_json = {
+        #     "outlet_id": "1",
+        #     "outlet_location": "Chennai",
+        #     "central_hub_location": "Bangalore",
+        #     "date": "2023-12-07T15:04:05Z",
+        #     "event": "Summer Fashion Festival",
+        #     "event_description": "The upcoming Summer Fashion Festival is expected to significantly increase the demand for fashion retail. We anticipate higher footfall in our Chennai store due to the festival season. T-shirts and dresses are particularly in demand during summer festivals in South India.",
+        #     "client_preferences": "Chennai customers prefer comfortable cotton clothing due to the warm climate. T-shirts and traditional formal wear are popular among the working professionals. Current fashion trends show increased demand for casual tops and western wear.",
+        #     "weather": "warm and humid",
+        #     "outlet_inventory": {
+        #         "t_shirt": {
+        #             "current_storage_amount": 100,
+        #             "daily_replenishment_without_envent_from_central_hub": 30,
+        #             "max_warehouse_capacity": 500
+        #         },
+        #         "dress": {
+        #             "current_storage_amount": 200,
+        #             "daily_replenishment_without_envent_from_central_hub": 50,
+        #             "max_warehouse_capacity": 300
+        #         },
+        #         "pants": {
+        #             "current_storage_amount": 150,
+        #             "daily_replenishment_without_envent_from_central_hub": 40,
+        #             "max_warehouse_capacity": 400
+        #         },
+        #         "tops": {
+        #             "current_storage_amount": 150,
+        #             "daily_replenishment_without_envent_from_central_hub": 40,
+        #             "max_warehouse_capacity": 500
+        #         }
+        #     }
+        # }
+        with open('../../data/default_data_role_playing.json', 'r') as f:
+            response_json = json.load(f)['outlet']
+
     # Copy the central hub json
     _central_hub_json = central_hub_json.copy()
     user_id = request_json["outlet_id"]
-    response_json = {
-        "outlet_inventory": {
-            "baguette": {
-                "future_storage_amount": "<NUM>",
-                "specific_reason_of_replenishment": "<STRING>",
-            },
-            "black_tea": {
-                "future_storage_amount": "<NUM>",
-                "specific_reason_of_replenishment": "<STRING>",
-            },
-            "manchego_cheese": {
-                "future_storage_amount": "<NUM>",
-                "specific_reason_of_replenishment": "<STRING>",
-            },
-            "olive_oil": {
-                "future_storage_amount": "<NUM>",
-                "specific_reason_of_replenishment": "<STRING>",
-            },
-        },
-        "transportation_duration": "<NUM> day"
-    }
+    with open('../../data/default_data_role_playing.json', 'r') as f:
+        response_json = json.load(f)['output_format']
+    # response_json = {
+    #     "outlet_inventory": {
+    #         "t_shirt": {
+    #             "future_storage_amount": "<NUM>",
+    #             "specific_reason_of_replenishment": "<STRING>",
+    #         },
+    #         "dress": {
+    #             "future_storage_amount": "<NUM>",
+    #             "specific_reason_of_replenishment": "<STRING>",
+    #         },
+    #         "pants": {
+    #             "future_storage_amount": "<NUM>",
+    #             "specific_reason_of_replenishment": "<STRING>",
+    #         },
+    #         "tops": {
+    #             "future_storage_amount": "<NUM>",
+    #             "specific_reason_of_replenishment": "<STRING>",
+    #         },
+    #     },
+    #     "transportation_duration": "<NUM> day"
+    # }
+
+
     # Add the central hub inventory to the request
     input_json = request_json | central_hub_json
+
+    print('input_json: ', input_json)
 
     context_text = "===== CONTEXT =====\n" + json.dumps(input_json, indent=4) + """
 The \"historical_daily_replenishment_amount_from_central_hub\" means the average daily replenishment amount from the central hub to the outlet in the past. So it could be used as a reference for the replenishment amount in the future.
@@ -90,21 +99,37 @@ While making decisions, the central hub should first consider the neccessary inf
 
     answer_template = "===== JSON TEMPLATE =====\n"
     answer_template += json.dumps(response_json, indent=4)
+    print('answer_template: ', answer_template)
     assistant_answer_template = answer_template
 
     chat_record = context_text
+    print('context_text: ', context_text)
 
-    ai_user_role = "Inventory Management Specialist of Central Hub"
-    ai_user_description = "This expert has strong organizational skills, attention to detail, and a deep understanding of supply chain and inventory management systems, who should be proficient in inventory tracking has the ability to analyze stock levels to ensure availability for events. Their duties would include categorizing goods, forecasting demand based on the event description, and configuring the inventory system to reflect accurate information for event-specific requirements."
-    ai_assistant_role = "Event Logistics Coordinator of Outlet"
-    ai_assistant_description = "This expert has experience in event planning and logistics, with a knack for coordinating with multiple stakeholders, who should have competencies in project management, mathematical calculation (Need to determine the final value of the equations) and problem-solving. Their duties involve understanding the event description to determine the necessary goods, liaising with the Inventory Management Specialist to ensure proper stock levels, and overseeing the setup to meet the event's needs."
+    ai_user_role = "Fashion Retail Inventory Manager"
+    ai_user_description = """This expert specializes in fashion retail inventory management with deep understanding of:
+- Seasonal fashion trends and demand patterns
+- Regional clothing preferences across Chennai, Bangalore, Mumbai, and Pune
+- Climate-specific clothing requirements
+- Festival and event-based fashion demand
+- Supply chain optimization for fashion retail
+Their duties include forecasting fashion trends, managing stock levels, and ensuring proper distribution across all retail locations."""
+    ai_assistant_role = "Fashion Store Operations Coordinator"
+    ai_assistant_description = """This expert has extensive experience in fashion retail operations with expertise in:
+- Fashion retail event planning
+- Regional fashion preferences
+- Seasonal collection management
+- Store inventory optimization
+- Customer demand prediction
+Their duties involve coordinating with the central warehouse, planning for fashion events and festivals, and ensuring optimal stock levels for different clothing categories."""
 
     # You can use the following code to play the role-playing game
     function_list = [*MATH_FUNCS]
+    print('function_list: ', function_list)
     assistant_model_config = FunctionCallingConfig.from_openai_function_list(
         function_list=function_list,
         kwargs=dict(temperature=0.7),
     )
+    print('assistant_model_config: ', assistant_model_config)
     assistant_model_config = ChatGPTConfig(temperature=0.7)
     user_model_config = ChatGPTConfig(temperature=0.7)
     sys_msg_meta_dicts = [

@@ -110,14 +110,14 @@ func (h *CentralHub) SetInventory(inventory map[string]*product.Product) {
 	h.resources = inventory
 }
 func InitializeHub() {
-	GetHubInstance("Central Hub", "Paris")
+	GetHubInstance("Central Hub", "Bangalore")
 	inventory := make(map[string]*product.Product)
 
 	// Initialize the inventory
-	inventory["Olive Oil"] = product.NewProduct("Olive Oil", 1000, 30, 500)
-	inventory["Baguette"] = product.NewProduct("Baguette", 2000, 50, 300)
-	inventory["Manchego Cheese"] = product.NewProduct("Manchego Cheese", 1500, 40, 400)
-	inventory["Black Tea"] = product.NewProduct("Black Tea", 800, 20, 250)
+	inventory["T-Shirt"] = product.NewProduct("T-Shirt", 1000, 50, 2000)
+	inventory["Dress"] = product.NewProduct("Dress", 500, 30, 1000)
+	inventory["Pants"] = product.NewProduct("Pants", 800, 40, 1500)
+	inventory["Tops"] = product.NewProduct("Tops", 700, 35, 1200)
 
 	// Start the WebSocket server
 	http.HandleFunc("/centralhub", instance.HandleWebSocket)
@@ -168,14 +168,14 @@ func (h *CentralHub) IntegrateAIResponseToGeneralInfo(event string, date time.Ti
 	warehouseProduct := make(map[string]int)
 	for name, item := range aiResponseData.CentralhubStock {
 		switch name {
-		case "baguette":
-			name = "Baguette"
-		case "black_tea":
-			name = "Black Tea"
-		case "manchego_cheese":
-			name = "Manchego Cheese"
-		case "olive_oil":
-			name = "Olive Oil"
+		case "T-Shirt":
+			name = "t_shirt"
+		case "Dress":
+			name = "dress"
+		case "Pants":
+			name = "pants"
+		case "Tops":
+			name = "tops"
 		}
 		warehouseProduct[name] = item.CurrentStorageAmount
 	}
@@ -252,30 +252,30 @@ func (h *CentralHub) HandleEventNotification(outletID string, outletlocation str
 	replenishments := make(map[string]int)
 
 	// Calculate the number of products that need to be replenished
-	for name, _ := range shopInventory {
-		// Switch name keys to _
+	for name := range shopInventory {
+		// Switch name keys to match AI response keys
 		switch name {
-		case "Baguette":
-			name = "baguette"
-		case "Black Tea":
-			name = "black_tea"
-		case "Manchego Cheese":
-			name = "manchego_cheese"
-		case "Olive Oil":
-			name = "olive_oil"
+		case "T-Shirt":
+			name = "t_shirt"
+		case "Dress":
+			name = "dress"
+		case "Pants":
+			name = "pants"
+		case "Tops":
+			name = "tops"
 		}
 
 		if ReplenishmentData, exists := aiResponse.ReplenishmentData[name]; exists {
-			// Switch name keys to _
+			// Switch name keys back to original for updating resources
 			switch name {
-			case "baguette":
-				name = "Baguette"
-			case "black_tea":
-				name = "Black Tea"
-			case "manchego_cheese":
-				name = "Manchego Cheese"
-			case "olive_oil":
-				name = "Olive Oil"
+			case "t_shirt":
+				name = "T-Shirt"
+			case "dress":
+				name = "Dress"
+			case "pants":
+				name = "Pants"
+			case "tops":
+				name = "Tops"
 			}
 
 			quantityNeeded := ReplenishmentData.ChangedReplenishmentAmount
