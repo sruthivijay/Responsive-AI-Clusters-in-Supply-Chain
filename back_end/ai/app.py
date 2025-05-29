@@ -6,8 +6,45 @@ import os
 import threading
 import time
 import websockets
+from dotenv import load_dotenv
+import os
+from camel.models import ModelFactory
+from camel.types import ModelPlatformType, ModelType
+
+load_dotenv()
 
 from multi_agent_communication_supply_chain import role_playing, messages_queue
+
+# azure_model_config = {
+#     "api_key": os.getenv("AZURE_OPENAI_KEY"),
+#     "url": os.getenv("AZURE_OPENAI_BASE_URL"),
+#     "api_version": os.getenv("AZURE_API_VERSION"),
+#     "azure_deployment_name": os.getenv("AZURE_DEPLOYMENT_NAME"),
+#     "temperature": 0.7
+# }
+
+if not os.getenv("AZURE_OPENAI_API_KEY"):
+    raise EnvironmentError("Missing AZURE_OPENAI_API_KEY environment variable.")
+if not os.getenv("AZURE_OPENAI_BASE_URL"):
+    raise EnvironmentError("Missing AZURE_OPENAI_BASE_URL environment variable.")
+if not os.getenv("AZURE_API_VERSION"):
+    raise EnvironmentError("Missing AZURE_API_VERSION environment variable.")
+if not os.getenv("AZURE_DEPLOYMENT_NAME"):
+    raise EnvironmentError("Missing AZURE_DEPLOYMENT_NAME environment variable.")
+
+azure_model = ModelFactory.create(
+    model_platform=ModelPlatformType.AZURE,
+    model_type=ModelType.GPT_4O,  # Changed from GPT_4O to GPT_4
+    model_config_dict={
+        "temperature": 0.7,  # Only include valid Azure OpenAI parameters here
+    },
+    api_key=os.getenv("AZURE_OPENAI_API_KEY"),  # Ensure this is set in the environment
+    url=os.getenv("AZURE_OPENAI_BASE_URL"),  # Ensure this is set in the environment
+    api_version=os.getenv("AZURE_API_VERSION"),  # Ensure this is set in the environment
+    azure_deployment_name=os.getenv("AZURE_DEPLOYMENT_NAME")  # Ensure this is set in the environment
+)
+
+# Check if the required environment variables are set
 
 
 global central_hub_json
@@ -112,7 +149,11 @@ def run_websocket_server():
 
 # Clenup the chat record, path 'back_end/ai/chat_record'
 def cleanup_chat_record():
-    directory_path = os.path.join(os.path.dirname(__file__), "chat_record")
+    directory_path = os.path.join(os.path.dirname(__name__), "chat_record")
+    # Ensure the directory exists
+    if not os.path.exists(directory_path):
+        os.makedirs(directory_path)  # Create the directory if it doesn't exist
+    # Clean up files in the directory
     for file_name in os.listdir(directory_path):
         file_path = os.path.join(directory_path, file_name)
         os.remove(file_path)
@@ -144,10 +185,11 @@ def handle_ai_request():
     global central_hub_json
     try:
         cleanup_chat_record()  # Cleanup the chat record
-        response_json, updated_central_hub_json = role_playing(request_json=request_data, central_hub_json=central_hub_json)
+        response_json, updated_central_hub_json = role_playing(model= azure_model,request_json=request_data, central_hub_json=central_hub_json)
         print('response_json1: ', response_json)
         print('updated_central_hub_json1: ', updated_central_hub_json)
-    except:
+    except Exception as e:
+        raise e
         # If the role_playing function fails, return a default response
         with open('../../data/default_data.json', 'r') as f:
             response_json = json.load(f)

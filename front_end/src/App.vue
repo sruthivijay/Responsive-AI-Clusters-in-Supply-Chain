@@ -745,6 +745,7 @@ export default {
     message1start() {
       this.message1 = new WebSocket("ws://localhost:8000/message1");
       this.message1.onmessage = (event) => {
+        console.log("Message received on message1:", event.data);
         const data = JSON.parse(event.data);
         if (data.SpeakerID == "1") {
           this.messages1_text.push({
@@ -752,11 +753,6 @@ export default {
             text: data.text,
             speakerid: data.SpeakerID,
           });
-          // Make the text box automatically scroll
-          if (this.showMessages1) {
-            const container1 = this.$refs.messages1;
-            container1.scrollTop = container1.scrollHeight;
-          }
         }
       };
       this.message1.onopen = () => {

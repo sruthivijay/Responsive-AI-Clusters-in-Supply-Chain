@@ -188,17 +188,37 @@ func (h *CentralHub) IntegrateAIResponseToGeneralInfo(event string, date time.Ti
 }
 
 func (h *CentralHub) sendGeneralInfoToFrontEnd(info *GeneralInfo) {
-	// Send the general information to the frontend
+	// Ensure the WebSocket client is initialized
 	if h.client == nil {
-		fmt.Println("Error in sending general info to front end: h.client is nil")
-		return
+		log.Println("Error in sending general info to front end: h.client is nil. Attempting to reconnect...")
+		// Attempt to reconnect the WebSocket client
+		err := h.reconnectWebSocket()
+		if err != nil {
+			log.Printf("Failed to reconnect WebSocket client: %v\n", err)
+			return
+		}
 	}
 
-	// Send Post Request to Frontend
+	// Send the general information to the frontend
 	err := h.client.WriteJSON(info)
 	if err != nil {
 		log.Printf("Error sending message to WebSocket: %v\n", err)
 	}
+}
+
+func (h *CentralHub) reconnectWebSocket() error {
+	// Define the WebSocket server URL
+	serverURL := "ws://localhost:8001/centralhub" // Replace with the actual WebSocket server URL
+
+	// Establish a new WebSocket connection
+	conn, _, err := websocket.DefaultDialer.Dial(serverURL, nil)
+	if err != nil {
+		return fmt.Errorf("failed to reconnect WebSocket: %w", err)
+	}
+
+	h.client = conn
+	log.Println("Successfully reconnected WebSocket client.")
+	return nil
 }
 
 func (h *CentralHub) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
