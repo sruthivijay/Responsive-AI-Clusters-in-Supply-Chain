@@ -8,10 +8,19 @@ import time
 import websockets
 from dotenv import load_dotenv
 import os
+
+# Explicitly specify the path to the .env file
+dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
+load_dotenv(dotenv_path=dotenv_path)
+
+# Debugging: Print the loaded environment variables
+print("AZURE_OPENAI_API_KEY:", os.getenv("AZURE_OPENAI_API_KEY"))
+print("AZURE_OPENAI_BASE_URL:", os.getenv("AZURE_OPENAI_BASE_URL"))
+print("AZURE_API_VERSION:", os.getenv("AZURE_API_VERSION"))
+print("AZURE_DEPLOYMENT_NAME:", os.getenv("AZURE_DEPLOYMENT_NAME"))
+
 from camel.models import ModelFactory
 from camel.types import ModelPlatformType, ModelType
-
-load_dotenv()
 
 from multi_agent_communication_supply_chain import role_playing, messages_queue
 
@@ -50,7 +59,7 @@ azure_model = ModelFactory.create(
 global central_hub_json
 
 # Importing central hub json
-with open('../../data/central_hub.json', 'r') as f:
+with open('Responsive-AI-Clusters-in-Supply-Chain/data/central_hub.json', 'r') as f:
     central_hub_json = json.load(f)
 
 # central_hub_json = {
@@ -109,10 +118,10 @@ app = Flask(__name__)
 async def get_message_from_queue(messages_queue):
     return await asyncio.to_thread(messages_queue.get)
 
-async def send_streaming_message(websocket, path):
+async def send_streaming_message(websocket):
     while True:
         message = await get_message_from_queue(messages_queue)  # Retrieve a message from the queue
-        print(f"The message from the message queue:\n{message}")
+        print(f"MESSAGE QUEUE MESSAGES:The message from the message queue:\n{message}")
         if message is None:
             break
 
@@ -141,11 +150,12 @@ async def send_streaming_message(websocket, path):
         messages_queue.task_done()  # Mark the task as done
 
 def run_websocket_server():
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    start_server = websockets.serve(functools.partial(send_streaming_message), 'localhost', 8000)
-    loop.run_until_complete(start_server)
-    loop.run_forever()
+    async def start_server():
+        print("Starting WebSocket server on ws://localhost:8000")  # Debug log
+        async with websockets.serve(send_streaming_message, 'localhost', 8000):
+            await asyncio.Future()  # Run forever
+
+    asyncio.run(start_server())
 
 # Clenup the chat record, path 'back_end/ai/chat_record'
 def cleanup_chat_record():

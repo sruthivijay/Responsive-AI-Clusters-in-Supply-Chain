@@ -65,13 +65,13 @@ def role_playing(model, chat_turn_limit=30, request_json=None, central_hub_json=
         #         }
         #     }
         # }
-        with open('../../data/default_data_role_playing.json', 'r') as f:
+        with open('Responsive-AI-Clusters-in-Supply-Chain/data/default_data_role_playing.json', 'r') as f:
             response_json = json.load(f)['outlet']
 
     # Copy the central hub json
     _central_hub_json = central_hub_json.copy()
     user_id = request_json["outlet_id"]
-    with open('../../data/default_data_role_playing.json', 'r') as f:
+    with open('Responsive-AI-Clusters-in-Supply-Chain/data/default_data_role_playing.json', 'r') as f:
         response_json = json.load(f)['output_format']
     # response_json = {
     #     "outlet_inventory": {

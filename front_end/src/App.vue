@@ -1,11 +1,15 @@
 <template>
   <header>
-    <img class="utc" alt="utc logo" src="@/assets/utc_logo.jpg" />
-    <h1 class="title">Responsive AI Clusters in Supply Chain</h1>
+    <div class="header-content">
+      <h1 class="title">Supply Chain Simulation for Retail</h1>
+      <h2 class="subtitle">Optimizing Inventory and Communication</h2>
+    </div>
     <button @click="start" class="btn">Start</button>
   </header>
   <div class="information">
-    <h2 class="date">Date: {{ date }}</h2>
+    <label for="simulation-date" class="date-label">Simulation Date:</label>
+    <input type="date" id="simulation-date" v-model="date" class="date-picker" />
+    <p v-if="date" class="selected-date">Selected Date: {{ date }}</p> <!-- Added date display -->
   </div>
   <div ref="visualization">
     <div class="table">
@@ -105,32 +109,39 @@
         <p class="event4">{{ event4 }}</p>
       </div>
 
-      <div ref="messages1" class="message-container1" :class="{ enlarged: isEnlarged1 }" @click.stop="toggleEnlarge1"
+      <div ref="messages1" class="message-card message-container1" :class="{ enlarged: isEnlarged1 }" @click.stop="toggleEnlarge1"
         v-if="showMessages1">
+        <span v-if="messages1_text.length === 0" class="placeholder">No messages yet</span>
         <span v-for="msg in messages1_text" :key="msg.id" :class="['message', getMessageClass(msg.speakerid)]">{{ msg.text
         }}
         </span>
       </div>
-      <div ref="messages2" class="message-container2" :class="{ enlarged: isEnlarged2 }" @click.stop="toggleEnlarge2"
+      <div ref="messages2" class="message-card message-container2" :class="{ enlarged: isEnlarged2 }" @click.stop="toggleEnlarge2"
         v-if="showMessages2">
+        <span v-if="messages2_text.length === 0" class="placeholder">No messages yet</span>
         <span v-for="msg in messages2_text" :key="msg.id" :class="['message', getMessageClass(msg.speakerid)]">{{ msg.text
         }}
         </span>
       </div>
-      <div ref="messages3" class="message-container3" :class="{ enlarged: isEnlarged3 }" @click.stop="toggleEnlarge3"
+      <div ref="messages3" class="message-card message-container3" :class="{ enlarged: isEnlarged3 }" @click.stop="toggleEnlarge3"
         v-if="showMessages3">
+        <span v-if="messages3_text.length === 0" class="placeholder">No messages yet</span>
         <span v-for="msg in messages3_text" :key="msg.id" :class="['message', getMessageClass(msg.speakerid)]">{{ msg.text
         }}
         </span>
       </div>
-      <div ref="messages4" class="message-container4" :class="{ enlarged: isEnlarged4 }" @click.stop="toggleEnlarge4"
+      <div ref="messages4" class="message-card message-container4" :class="{ enlarged: isEnlarged4 }" @click.stop="toggleEnlarge4"
         v-if="showMessages4">
+        <span v-if="messages4_text.length === 0" class="placeholder">No messages yet</span>
         <span v-for="msg in messages4_text" :key="msg.id" :class="['message', getMessageClass(msg.speakerid)]">{{ msg.text
         }}
         </span>
       </div>
     </div>
   </div>
+  <footer>
+    <p>&copy; 2025 Supply Chain AI. All rights reserved.</p>
+  </footer>
 </template>
 
 <script>
@@ -289,28 +300,28 @@ export default {
         .attr("height", 350);
       this.svg
         .append("image")
-        .attr("xlink:href", require("@/assets/auchan.png"))
+        .attr("xlink:href", require("@/assets/zara_chennai.png"))
         .attr("x", this.supermarkets[0].x - 150)
         .attr("y", this.supermarkets[0].y - 150)
         .attr("width", 300)
         .attr("height", 300);
       this.svg
         .append("image")
-        .attr("xlink:href", require("@/assets/carrefour.png"))
+        .attr("xlink:href", require("@/assets/zara_bangalore.png"))
         .attr("x", this.supermarkets[1].x - 150)
         .attr("y", this.supermarkets[1].y - 150)
         .attr("width", 300)
         .attr("height", 300);
       this.svg
         .append("image")
-        .attr("xlink:href", require("@/assets/monoprix.png"))
+        .attr("xlink:href", require("@/assets/zara_pune.png"))
         .attr("x", this.supermarkets[2].x - 150)
         .attr("y", this.supermarkets[2].y - 150)
         .attr("width", 300)
         .attr("height", 300);
       this.svg
         .append("image")
-        .attr("xlink:href", require("@/assets/normal.png"))
+        .attr("xlink:href", require("@/assets/zara_hyderabad.png"))
         .attr("x", this.supermarkets[3].x - 150)
         .attr("y", this.supermarkets[3].y - 150)
         .attr("width", 300)
@@ -355,6 +366,15 @@ export default {
         // 连接关闭时的处理
         console.log('WebSocket Closed:', event);
       };
+
+      // Increment the date during the simulation
+      if (this.date) {
+        const startDate = new Date(this.date);
+        setInterval(() => {
+          startDate.setDate(startDate.getDate() + 1);
+          this.date = startDate.toISOString().split('T')[0]; // Update the date in YYYY-MM-DD format
+        }, this.onedaytime); // Increment based on the simulation's day duration
+      }
     },
     
     /* enlarge & close*/
@@ -510,7 +530,7 @@ export default {
               .attr("y", this.warehouse.y + size)
               .attr("width", size * 2)
               .attr("height", size * 2)
-              .attr("xlink:href", require("@/assets/oil.png"));
+              .attr("xlink:href", require("@/assets/t-shirt.png"));
             //.style("opacity", 1);
             //.style("fill", "red");
             boxa
@@ -543,7 +563,7 @@ export default {
               .attr("y", this.warehouse.y - size)
               .attr("width", size * 2)
               .attr("height", size * 2)
-              .attr("xlink:href", require("@/assets/bread.png"));
+              .attr("xlink:href", require("@/assets/dress.png"));
             //.style("opacity", 0);
             //.style("fill", "blue");
             boxb
@@ -576,7 +596,7 @@ export default {
               .attr("y", this.warehouse.y - size)
               .attr("width", size * 2)
               .attr("height", size * 2)
-              .attr("xlink:href", require("@/assets/cheese.png"));
+              .attr("xlink:href", require("@/assets/pants.png"));
             //.style("opacity", 0);
             //.style("fill", "green");
             boxc
@@ -609,7 +629,7 @@ export default {
               .attr("y", this.warehouse.y + size)
               .attr("width", size * 2)
               .attr("height", size * 2)
-              .attr("xlink:href", require("@/assets/tea.png"));
+              .attr("xlink:href", require("@/assets/ladies-top.png"));
             //.style("opacity", 0);
             //.style("fill", "orange");
             boxd
@@ -642,6 +662,14 @@ export default {
     /* Receive Supermarkets info and send boxes */
     outlet1start() {
       this.outlet1 = new WebSocket("ws://localhost:8001/outlet1");
+
+      this.outlet1.onopen = () => {
+        console.log("WebSocket outlet1 Connection Established");
+      };
+
+      this.outlet1.onerror = (error) => {
+      console.error("outlet1 error:", error);
+    };
       this.outlet1.onmessage = (event) => {
         const data = JSON.parse(event.data);
         this.sendBoxToSupermarket(data);
@@ -966,36 +994,76 @@ export default {
 /* background #def6f6 */
 /* table border #dc3636 */
 
+header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(255, 255, 255);
+  color: black;
+  padding: 20px;
+  border-bottom: 2px solid #ccc;
+  position: relative;
+}
+
+.header-content {
+  text-align: center;
+}
+
+.title {
+  font-size: 56px;
+  font-weight: bold;
+  margin: 0;
+  color: #2e75c2;
+}
+
+.subtitle {
+  font-size: 28px;
+  color: #555;
+  font-weight: 500;
+  margin-top: 5px;
+}
+
+.btn {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 12px 20px;
+  font-size: 20px;
+  background-color: green !important; /* Force green color */
+  color: white;
+}
+
+.btn:hover {
+  background-color: white !important;
+  color: green !important;
+  border: 2px solid green !important;
+}
+
+/* //////////////////////////////////////////////////// */
+
 #app {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #333;
-  background-color: #def6f6;
+  background: linear-gradient(to bottom, #e0f7fa, #ffffff);
   margin: 0;
   padding: 0;
-}
-
-header {
+  min-height: 100vh;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: rgb(255, 255, 255);
-  color: black;
-  padding: 10px;
+  flex-direction: column;
 }
 
-.utc {
-  height: 100px;
-}
-
-.title {
-  flex-grow: 1;
+footer {
   text-align: center;
-  font-size: 48px;
+  padding: 10px;
+  background-color: #f1f1f1;
+  border-top: 2px solid #ccc;
+  margin-top: auto;
+  font-size: 14px;
+  color: #555;
 }
-
-/* //////////////////////////////////////////////////// */
 
 .btn,
 .bth:link,
@@ -1029,13 +1097,28 @@ header {
 .information {
   padding: 20px;
   background: linear-gradient(to bottom, white, #def6f6);
+  text-align: center;
 }
 
-.date {
-  margin: 0 20px;
-  font-size: 42px;
-  color: #2e75c2;
-  padding-bottom: 20px;
+.date-label {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  margin-right: 10px;
+}
+
+.date-picker {
+  font-size: 16px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.selected-date {
+  margin-top: 10px;
+  font-size: 16px;
+  color: #333;
+  font-weight: bold;
 }
 
 /* //////////////////////////////////////////////////// */
@@ -1133,9 +1216,6 @@ header {
   position: relative;
   height: 10px;
   width: 10px;
-}
-
-.communication {
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -1289,5 +1369,27 @@ header {
   left: 900px;
   background-color: white;
 
+}
+
+.message-card {
+  background-color: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  margin: 10px 0;
+  width: 300px;
+  height: 330px;
+  overflow-y: auto;
+  font-size: 14px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.placeholder {
+  color: #aaa;
+  font-style: italic;
+  text-align: center;
+  display: block;
+  margin-top: 50%;
 }
 </style>
