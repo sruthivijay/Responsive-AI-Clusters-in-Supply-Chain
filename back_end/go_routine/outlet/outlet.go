@@ -105,6 +105,7 @@ func (o *Outlet) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	o.client = conn
+	log.Printf("✅ WebSocket connection established for outlet %s", o.outletID)
 }
 
 var (

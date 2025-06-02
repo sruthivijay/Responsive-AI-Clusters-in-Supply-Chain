@@ -18,8 +18,8 @@ class FormatAgent(ChatAgent):
 
     def __init__(
         self,
-        model_type: ModelType = ModelType.GPT_3_5_TURBO,
-        model_config: Optional[Any] = None,
+        model
+        # model_type: ModelType = ModelType.GPT_4O
     ) -> None:
         system_message = BaseMessage(
             role_name="Format Agent",
@@ -27,7 +27,8 @@ class FormatAgent(ChatAgent):
             meta_dict=None,
             content="You generate format text from a provided text.",
         )
-        super().__init__(system_message, model_type, model_config)
+        # Pass model_type as part of the model configuration, not as memory
+        super().__init__(system_message=system_message, model=model)
 
     def run(
         self,

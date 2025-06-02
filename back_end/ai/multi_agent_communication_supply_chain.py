@@ -5,17 +5,32 @@ import re
 
 from colorama import Fore
 
-from camel.configs import ChatGPTConfig, FunctionCallingConfig
+from camel.configs import ChatGPTConfig
 from camel.societies import RolePlaying
-from camel.functions import MATH_FUNCS
 from camel.types import ModelType, TaskType
-
 from format_agent import FormatAgent
+from camel.toolkits import MathToolkit
+
+
 
 messages_queue = queue.Queue()
 
 
-def role_playing(model_type=ModelType.GPT_3_5_TURBO, chat_turn_limit=30, request_json=None, central_hub_json=None) -> None:
+def normalize_product_names(data):
+    """Normalize product names to lowercase and replace spaces with underscores."""
+    if "outlet_inventory" in data:
+        normalized_inventory = {}
+        for product_name, details in data["outlet_inventory"].items():
+            normalized_name = product_name.lower().replace(" ", "_")
+            normalized_inventory[normalized_name] = details
+        data["outlet_inventory"] = normalized_inventory
+    return data
+
+
+def role_playing(model, chat_turn_limit=30, request_json=None, central_hub_json=None) -> None:
+    # Normalize product names in request_json
+    request_json = normalize_product_names(request_json)
+
     if request_json is None:
         # Update the default request json
         # request_json = {
@@ -86,18 +101,27 @@ def role_playing(model_type=ModelType.GPT_3_5_TURBO, chat_turn_limit=30, request
 
     print('input_json: ', input_json)
 
-    context_text = "===== CONTEXT =====\n" + json.dumps(input_json, indent=4) + """
-The \"historical_daily_replenishment_amount_from_central_hub\" means the average daily replenishment amount from the central hub to the outlet in the past. So it could be used as a reference for the replenishment amount in the future.
-The \"max_warehouse_capacity\" means the maximum capacity of the warehouse of the outlet.
-The \"specific_reason_of_replenishment\" means the specific reason of replenishment for the outlet (the decisions made by the central hub) at present.
-THe current storage amount of the outlet should be less than the maximum capacity of the warehouse of the outlet.
-While making decisions, the central hub should first consider the neccessary information in the context, and then predict what is the unknown demand of outlet in the event.
-"""
-    task_prompt = "In order to help the outlet to handle the upcoming events well, " + \
-        "please make decisions based on the known information (you need to show the basis and the thoughts specifically). " + \
-        "The standard of the task completion is that the AI assistant (Event Logistics Coordinator of Outlet) MUST make sure every BLANKs in the JSON template are filled with sertain values or strings."
+    with open('../config/prompts.json', 'r') as f:
+        prompts_json = json.load(f)
 
-    answer_template = "===== JSON TEMPLATE =====\n"
+#     context_text = "===== CONTEXT =====\n" + json.dumps(input_json, indent=4) + """
+# The \"historical_daily_replenishment_amount_from_central_hub\" means the average daily replenishment amount from the central hub to the outlet in the past. So it could be used as a reference for the replenishment amount in the future.
+# The \"max_warehouse_capacity\" means the maximum capacity of the warehouse of the outlet.
+# The \"specific_reason_of_replenishment\" means the specific reason of replenishment for the outlet (the decisions made by the central hub) at present.
+# THe current storage amount of the outlet should be less than the maximum capacity of the warehouse of the outlet.
+# While making decisions, the central hub should first consider the neccessary information in the context, and then predict what is the unknown demand of outlet in the event.
+# """
+
+    context_text = "===== CONTEXT =====\n" + json.dumps(input_json, indent=4) + prompts_json['context_text']
+
+    # task_prompt = "In order to help the outlet to handle the upcoming events well, " + \
+    #     "please make decisions based on the known information (you need to show the basis and the thoughts specifically). " + \
+    #     "The standard of the task completion is that the AI assistant (Event Logistics Coordinator of Outlet) MUST make sure every BLANKs in the JSON template are filled with sertain values or strings."
+
+    task_prompt = prompts_json['task_prompt']
+
+    # answer_template = "===== JSON TEMPLATE =====\n"
+    answer_template = prompts_json['answer_template']
     answer_template += json.dumps(response_json, indent=4)
     print('answer_template: ', answer_template)
     assistant_answer_template = answer_template
@@ -105,33 +129,39 @@ While making decisions, the central hub should first consider the neccessary inf
     chat_record = context_text
     print('context_text: ', context_text)
 
-    ai_user_role = "Fashion Retail Inventory Manager"
-    ai_user_description = """This expert specializes in fashion retail inventory management with deep understanding of:
-- Seasonal fashion trends and demand patterns
-- Regional clothing preferences across Chennai, Bangalore, Mumbai, and Pune
-- Climate-specific clothing requirements
-- Festival and event-based fashion demand
-- Supply chain optimization for fashion retail
-Their duties include forecasting fashion trends, managing stock levels, and ensuring proper distribution across all retail locations."""
-    ai_assistant_role = "Fashion Store Operations Coordinator"
-    ai_assistant_description = """This expert has extensive experience in fashion retail operations with expertise in:
-- Fashion retail event planning
-- Regional fashion preferences
-- Seasonal collection management
-- Store inventory optimization
-- Customer demand prediction
-Their duties involve coordinating with the central warehouse, planning for fashion events and festivals, and ensuring optimal stock levels for different clothing categories."""
+    # ai_user_role = "Fashion Retail Inventory Manager"
+    ai_user_role = prompts_json['ai_user_role']
+    ai_user_description = prompts_json['ai_user_description']
+#     ai_user_description = """This expert specializes in fashion retail inventory management with deep understanding of:
+# - Seasonal fashion trends and demand patterns
+# - Regional clothing preferences across Chennai, Bangalore, Mumbai, and Pune
+# - Climate-specific clothing requirements
+# - Festival and event-based fashion demand
+# - Supply chain optimization for fashion retail
+# Their duties include forecasting fashion trends, managing stock levels, and ensuring proper distribution across all retail locations."""
+    # ai_assistant_role = "Fashion Store Operations Coordinator"
+    
+    ai_assistant_role = prompts_json['ai_assistant_role']
+#     ai_assistant_description = """This expert has extensive experience in fashion retail operations with expertise in:
+# - Fashion retail event planning
+# - Regional fashion preferences
+# - Seasonal collection management
+# - Store inventory optimization
+# - Customer demand prediction
+# Their duties involve coordinating with the central warehouse, planning for fashion events and festivals, and ensuring optimal stock levels for different clothing categories."""
 
+    ai_assistant_description = prompts_json['ai_assistant_description']
     # You can use the following code to play the role-playing game
-    function_list = [*MATH_FUNCS]
+    math_toolkit = MathToolkit()
+    function_list = math_toolkit.get_tools()
     print('function_list: ', function_list)
-    assistant_model_config = FunctionCallingConfig.from_openai_function_list(
-        function_list=function_list,
-        kwargs=dict(temperature=0.7),
-    )
-    print('assistant_model_config: ', assistant_model_config)
-    assistant_model_config = ChatGPTConfig(temperature=0.7)
-    user_model_config = ChatGPTConfig(temperature=0.7)
+    # assistant_model_config = FunctionCallingConfig.from_openai_function_list(
+    #     function_list=function_list,
+    #     kwargs=dict(temperature=0.7),
+    # )
+    # print('assistant_model_config: ', assistant_model_config)
+    # assistant_model_config = ChatGPTConfig(temperature=0.7)
+    # user_model_config = ChatGPTConfig(temperature=0.7)
     sys_msg_meta_dicts = [
         dict(
             assistant_role=ai_assistant_role, user_role=ai_user_role,
@@ -143,40 +173,41 @@ Their duties involve coordinating with the central warehouse, planning for fashi
         assistant_role_name=ai_assistant_role,
         user_role_name=ai_user_role,
         assistant_agent_kwargs=dict(
-            model_type=model_type,
-            model_config=assistant_model_config,
-            function_list=function_list,
+            model=model,
+            tools=function_list,
         ),
         user_agent_kwargs=dict(
-            model_type=model_type,
-            model_config=user_model_config,
+            model=model,
         ),
-        model_type=model_type,
         task_type=TaskType.ROLE_DESCRIPTION,
         task_prompt=task_prompt + "\n" + assistant_answer_template,
         with_task_specify=False,
         extend_sys_msg_meta_dicts=sys_msg_meta_dicts,
     )
+
     print(Fore.YELLOW + f"Original task prompt:\n{task_prompt}\n")
     print(Fore.CYAN + f"Assistant prompt:\n{role_play_session.assistant_sys_msg.content}\n")
     print(Fore.MAGENTA + f"User prompt:\n{role_play_session.user_sys_msg.content}\n")
  
     n = 0
-    input_assistant_msg, _ = role_play_session.init_chat()
+    input_assistant_msg = role_play_session.init_chat()  # Adjusted to handle single return value
     while n < chat_turn_limit:
         n += 1
         assistant_response, user_response = role_play_session.step(
-            input_assistant_msg)
+            input_assistant_msg
+        )
 
         if assistant_response.terminated:
             print(Fore.GREEN +
                   ("AI Assistant terminated. Reason: "
-                   f"{assistant_response.info['termination_reasons']}."))
+                   f"{assistant_response.info['termination_reasons']}."
+                  ))
             break
         if user_response.terminated:
             print(Fore.GREEN +
                   ("AI User terminated. "
-                   f"Reason: {user_response.info['termination_reasons']}."))
+                   f"Reason: {user_response.info['termination_reasons']}."
+                  ))
             break
 
         print(Fore.BLUE + f"{ai_user_role}:\n\n{user_response.msg.content}\n")
@@ -186,7 +217,7 @@ Their duties involve coordinating with the central warehouse, planning for fashi
         event_name = request_json['event'].replace(" ", "_")  # Replace spaces with underscores for filename
         # 'back_end/ai/chat_record/chat_record_<event_name>.md'
         file_path = os.path.join(os.path.dirname(__file__), "chat_record", f"chat_record_{event_name}.md")
-        with open(file_path, "a") as f:
+        with open(file_path, "a", encoding="utf-8") as f:  # Specify UTF-8 encoding
             user_msg_md = user_response.msg.content.replace('\n', '\n\n')
             assistant_msg_md = assistant_response.msg.content.replace('\n', '\n\n')
             f.write(f"[{ai_user_role}]:\n\n{user_msg_md}\n\n\n")
@@ -201,12 +232,13 @@ Their duties involve coordinating with the central warehouse, planning for fashi
         if "CAMEL_TASK_DONE" in user_response.msg.content or \
             "CAMEL_TASK_DONE" in assistant_response.msg.content:
 
-            format_agent = FormatAgent(model_type=ModelType.GPT_4_TURBO, model_config=ChatGPTConfig(temperature=0.0))  # To make the output more readable, we use GPT-4 only
+            format_agent = FormatAgent(model = model)  # To make the output more readable, we use GPT-4 only
             output_text = format_agent.run(
                 user_role_name=ai_user_role,
                 assistant_role_name=ai_assistant_role,
                 chat_record=chat_record,
                 answer_template=response_json,
+                # functions=math_toolkit.get_functions(),
             ).replace("\'", "\"")
             output_text = re.sub(r'(\w)"(\w)', r'\1\"\2', output_text)
             print(Fore.BLUE + f"output_text:\n{output_text}\n")
@@ -252,7 +284,9 @@ Their duties involve coordinating with the central warehouse, planning for fashi
 
     # Calculate the changed replenishment amount from central hub
     for product in outlet_inventory_json:
-        current_storage_amount = request_json["outlet_inventory"][product]["current_storage_amount"]
+        normalized_product = product.lower().replace("_", "-")  # Ensure consistent formatting
+        print(request_json["outlet_inventory"])
+        current_storage_amount = request_json["outlet_inventory"][normalized_product]["current_storage_amount"]
         future_storage_amount = outlet_inventory_json[product]["future_storage_amount"]
         changed_replenishment_amount_from_central_hub = int(future_storage_amount) - int(current_storage_amount)
         if changed_replenishment_amount_from_central_hub < 0:
