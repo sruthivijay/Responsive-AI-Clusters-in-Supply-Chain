@@ -59,7 +59,7 @@ azure_model = ModelFactory.create(
 global central_hub_json
 
 # Importing central hub json
-with open('Responsive-AI-Clusters-in-Supply-Chain/data/central_hub.json', 'r') as f:
+with open('../../data/central_hub.json', 'r') as f:
     central_hub_json = json.load(f)
 
 # central_hub_json = {

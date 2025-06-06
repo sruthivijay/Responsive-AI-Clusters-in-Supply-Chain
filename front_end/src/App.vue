@@ -1,15 +1,28 @@
+
 <template>
+<div v-if="!isCreatePage">
+
   <header>
     <div class="header-content">
       <h1 class="title">Supply Chain Simulation for Retail</h1>
       <h2 class="subtitle">Optimizing Inventory and Communication</h2>
+
+    </div>
+
+
+
+    <div class="top-bar">
+        <router-link to="/create">
+          <button class="create-btn">Create</button>
+        </router-link>
     </div>
     <button @click="start" class="btn">Start</button>
+
   </header>
   <div class="information">
     <label for="simulation-date" class="date-label">Simulation Date:</label>
     <input type="date" id="simulation-date" v-model="date" class="date-picker" />
-    <p v-if="date" class="selected-date">Selected Date: {{ date }}</p> <!-- Added date display -->
+    <p v-if="date" class="selected-date">Selected Date: {{ date }}</p> 
   </div>
   <div ref="visualization">
     <div class="table">
@@ -142,15 +155,29 @@
   <footer>
     <p>&copy; 2025 Supply Chain AI. All rights reserved.</p>
   </footer>
+
+</div>
+
+<router-view v-if="isCreatePage" />
 </template>
 
 <script>
 import * as d3 from "d3";
 
+
+
 export default {
+
+  
   name: "App",
+computed: {
+    isCreatePage() {
+      return this.$route.path === '/create'
+    }
+  },
   data() {
     return {
+      showCreateSimulation: false,
       stock0: new Map([
         ["T-Shirts", 0],
         ["Dress", 0], 
@@ -994,6 +1021,22 @@ export default {
 /* background #def6f6 */
 /* table border #dc3636 */
 
+.create-btn {
+  background-color: #1A73E8;
+  color: white;
+  padding: 10px 26px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.create-btn:hover {
+  background-color: #155abd;
+}
+
+
 header {
   display: flex;
   justify-content: center;
@@ -1007,6 +1050,8 @@ header {
 
 .header-content {
   text-align: center;
+ /* pushes title left, button right */
+  padding: 0 20px; 
 }
 
 .title {
@@ -1022,7 +1067,19 @@ header {
   font-weight: 500;
   margin-top: 5px;
 }
-
+.top-bar {
+  display: absolute;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 20px 40px 0 0;
+  background: transparent;
+  position: absolute;
+  right: 15%;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 12px 20px;
+  font-size: 20px;
+}
 .btn {
   position: absolute;
   right: 20px;
@@ -1393,3 +1450,4 @@ footer {
   margin-top: 50%;
 }
 </style>
+
