@@ -1,0 +1,10 @@
+{
+  "inventory": {
+    "central_hub_file": "Responsive-AI-Clusters-in-Supply-Chain/data/central_hub.json",
+    "default_data_file": "../../data/default_data.json",
+    "default_data_role_playing_file": "../../data/default_data_role_playing.json"
+  },
+  "directories": {
+    "chat_record": "chat_record"
+  }
+}

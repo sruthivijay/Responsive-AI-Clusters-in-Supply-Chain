@@ -13,33 +13,13 @@ import os
 dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
 load_dotenv(dotenv_path=dotenv_path)
 
-# Debugging: Print the loaded environment variables
-print("AZURE_OPENAI_API_KEY:", os.getenv("AZURE_OPENAI_API_KEY"))
-print("AZURE_OPENAI_BASE_URL:", os.getenv("AZURE_OPENAI_BASE_URL"))
-print("AZURE_API_VERSION:", os.getenv("AZURE_API_VERSION"))
-print("AZURE_DEPLOYMENT_NAME:", os.getenv("AZURE_DEPLOYMENT_NAME"))
 
 from camel.models import ModelFactory
 from camel.types import ModelPlatformType, ModelType
 
 from multi_agent_communication_supply_chain import role_playing, messages_queue
+from db_services import fetch_inventory_data, replenish_inventory
 
-# azure_model_config = {
-#     "api_key": os.getenv("AZURE_OPENAI_KEY"),
-#     "url": os.getenv("AZURE_OPENAI_BASE_URL"),
-#     "api_version": os.getenv("AZURE_API_VERSION"),
-#     "azure_deployment_name": os.getenv("AZURE_DEPLOYMENT_NAME"),
-#     "temperature": 0.7
-# }
-
-if not os.getenv("AZURE_OPENAI_API_KEY"):
-    raise EnvironmentError("Missing AZURE_OPENAI_API_KEY environment variable.")
-if not os.getenv("AZURE_OPENAI_BASE_URL"):
-    raise EnvironmentError("Missing AZURE_OPENAI_BASE_URL environment variable.")
-if not os.getenv("AZURE_API_VERSION"):
-    raise EnvironmentError("Missing AZURE_API_VERSION environment variable.")
-if not os.getenv("AZURE_DEPLOYMENT_NAME"):
-    raise EnvironmentError("Missing AZURE_DEPLOYMENT_NAME environment variable.")
 
 azure_model = ModelFactory.create(
     model_platform=ModelPlatformType.AZURE,

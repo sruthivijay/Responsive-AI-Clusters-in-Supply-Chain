@@ -9,7 +9,6 @@
   <div class="information">
     <label for="simulation-date" class="date-label">Simulation Date:</label>
     <input type="date" id="simulation-date" v-model="date" class="date-picker" />
-    <p v-if="date" class="selected-date">Selected Date: {{ date }}</p> <!-- Added date display -->
   </div>
   <div ref="visualization">
     <div class="table">
@@ -366,15 +365,6 @@ export default {
         // 连接关闭时的处理
         console.log('WebSocket Closed:', event);
       };
-
-      // Increment the date during the simulation
-      if (this.date) {
-        const startDate = new Date(this.date);
-        setInterval(() => {
-          startDate.setDate(startDate.getDate() + 1);
-          this.date = startDate.toISOString().split('T')[0]; // Update the date in YYYY-MM-DD format
-        }, this.onedaytime); // Increment based on the simulation's day duration
-      }
     },
     
     /* enlarge & close*/
@@ -1112,13 +1102,6 @@ footer {
   padding: 5px;
   border: 1px solid #ccc;
   border-radius: 5px;
-}
-
-.selected-date {
-  margin-top: 10px;
-  font-size: 16px;
-  color: #333;
-  font-weight: bold;
 }
 
 /* //////////////////////////////////////////////////// */
